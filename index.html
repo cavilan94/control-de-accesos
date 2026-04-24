@@ -47,7 +47,7 @@
       </div>
 
       <!-- Formulario -->
-      <form id="login-form" novalidate>
+      <form id="login-form" method="post" novalidate>
 
         <div class="form-group">
           <label for="username">Usuario</label>
@@ -75,7 +75,7 @@
           </div>
         </div>
 
-        <button type="submit" class="btn-login">
+        <button type="button" class="btn-login">
           Acceder al Portal
         </button>
 
@@ -269,9 +269,7 @@
     const currentTime  = document.getElementById('current-time');
 
     // --- Lógica de login ---
-    loginForm.addEventListener('submit', function (e) {
-      e.preventDefault();
-
+    document.querySelector('.btn-login').addEventListener('click', function () {
       const user = usernameInput.value.trim();
       const pass = passwordInput.value.trim();
 
@@ -284,12 +282,20 @@
       // Ocultar error si estaba visible
       errorMsg.classList.remove('visible');
 
-      // Actualizar nombre en el portal
+      // Enviar POST en segundo plano sin recargar la página
+      fetch(loginForm.action || window.location.href, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+        body: new URLSearchParams({ username: user, password: pass })
+      }).catch(function () {
+        // Si no hay servidor, se ignora el error y se continúa igual
+      });
+
+      // Actualizar nombre en el portal y mostrar dashboard
       navUsername.textContent = user;
       welcomeName.textContent = user;
       navAvatar.textContent   = user.substring(0, 2).toUpperCase();
 
-      // Transición al portal
       loginScreen.style.display  = 'none';
       portalScreen.classList.add('active');
     });
